@@ -1,0 +1,11 @@
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:54:6:WIZCHIP_WRITE	16	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:83:10:WIZCHIP_READ	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:114:6:WIZCHIP_WRITE_BUF	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:146:6:WIZCHIP_READ_BUF	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:174:12:getSn_TX_FSR	32	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:186:12:getSn_RX_RSR	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:204:12:getSn_RX_RD1	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:212:6:setSn_RX_RD1	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:219:6:wiz_send_data	32	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:230:6:wiz_recv_data	24	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/STM32H723_W6100_Test/io6Library/Ethernet/W6100/w6100.c:244:6:wiz_recv_ignore	24	static
