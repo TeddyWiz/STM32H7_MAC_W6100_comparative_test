@@ -1,0 +1,4 @@
+../Utilities/3rdParty/MISC/core_state.c:43:8:core_bench_state	104	static
+../Utilities/3rdParty/MISC/core_state.c:116:6:core_init_state	40	static
+../Utilities/3rdParty/MISC/core_state.c:168:14:ee_isdigit	24	static
+../Utilities/3rdParty/MISC/core_state.c:184:17:core_state_transition	24	static

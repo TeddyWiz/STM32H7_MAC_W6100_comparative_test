@@ -1,0 +1,5 @@
+../Core/Src/stm32h7xx_hal_msp.c:66:6:HAL_MspInit	16	static
+../Core/Src/stm32h7xx_hal_msp.c:89:6:HAL_SPI_MspInit	232	static
+../Core/Src/stm32h7xx_hal_msp.c:193:6:HAL_SPI_MspDeInit	16	static
+../Core/Src/stm32h7xx_hal_msp.c:231:6:HAL_UART_MspInit	224	static
+../Core/Src/stm32h7xx_hal_msp.c:281:6:HAL_UART_MspDeInit	16	static

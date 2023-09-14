@@ -1,0 +1,9 @@
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:54:6:WIZCHIP_WRITE	16	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:83:10:WIZCHIP_READ	24	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:114:6:WIZCHIP_WRITE_BUF	24	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:146:6:WIZCHIP_READ_BUF	24	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:174:12:getSn_TX_FSR	32	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:186:12:getSn_RX_RSR	32	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:198:6:wiz_send_data	32	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:209:6:wiz_recv_data	32	static
+D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/W6100/w6100.c:221:6:wiz_recv_ignore	24	static
