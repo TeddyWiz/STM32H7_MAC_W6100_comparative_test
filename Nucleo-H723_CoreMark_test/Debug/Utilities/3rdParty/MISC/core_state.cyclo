@@ -1,0 +1,4 @@
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_state.c:43:8:core_bench_state	9
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_state.c:116:6:core_init_state	9
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_state.c:168:14:ee_isdigit	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_state.c:184:17:core_state_transition	26

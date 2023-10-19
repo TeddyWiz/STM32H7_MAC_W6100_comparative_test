@@ -1,0 +1,12 @@
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:63:8:calc_func	7
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:101:8:cmp_complex	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:112:8:cmp_idx	2
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:120:6:copy_info	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:132:8:core_bench_list	10
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:213:12:core_list_init	4
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:282:12:core_list_insert_new	3
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:316:12:core_list_remove	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:345:12:core_list_undo_remove	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:370:12:core_list_find	6
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:395:12:core_list_reverse	2
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_list_join.c:426:12:core_list_mergesort	13

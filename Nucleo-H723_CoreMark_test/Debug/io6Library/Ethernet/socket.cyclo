@@ -1,0 +1,14 @@
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:101:8:socket	30
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:186:8:close	4
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:204:8:listen	5
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:219:8:connect	15
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:266:8:disconnect	8
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:289:12:send	15
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:338:12:recv	9
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:371:12:recv_iperf	2
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:380:12:sendto	16
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:449:12:recvfrom	18
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:536:8:ctlsocket	17
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:584:8:setsockopt	15
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:628:8:getsockopt	24
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.c:697:9:peeksockmsg	6

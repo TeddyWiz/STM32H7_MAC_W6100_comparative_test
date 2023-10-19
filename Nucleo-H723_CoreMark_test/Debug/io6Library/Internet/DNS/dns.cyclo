@@ -1,0 +1,11 @@
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:127:10:get16	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:136:11:put16	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:154:5:parse_name	9
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:215:11:dns_question	2
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:241:11:dns_answer	19
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:355:8:parseDNSMSG	13
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:433:9:dns_makequery	4
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:498:8:check_DNS_timeout	3
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:518:6:DNS_init	1
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:526:8:DNS_run	7
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Internet/DNS/dns.c:594:6:DNS_time_handler	1

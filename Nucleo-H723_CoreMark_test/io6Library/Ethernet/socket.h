@@ -302,8 +302,8 @@ int8_t disconnect(uint8_t sn);
  *       In non-block io mode(@ref SF_IO_NONBLOCK), It return @ref SOCK_BUSY immediately when SOCKET transmittable buffer size is not enough or the previous sent data is not completed. \n
  */
 datasize_t send(uint8_t sn, uint8_t * buf, datasize_t len);
-datasize_t send_t(uint8_t sn, uint8_t * buf, datasize_t len);
-datasize_t send_t2(uint8_t sn, uint8_t * buf, datasize_t len);
+
+
 /**
  * @ingroup WIZnet_socket_APIs
  * @brief Receive data from the connected peer.
@@ -325,6 +325,7 @@ datasize_t send_t2(uint8_t sn, uint8_t * buf, datasize_t len);
  */
 datasize_t recv(uint8_t sn, uint8_t * buf, datasize_t len);
 
+datasize_t recv_iperf(uint8_t sn, uint8_t * buf, uint16_t len);
 
 /**
  * @ingroup WIZnet_socket_APIs

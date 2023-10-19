@@ -54,8 +54,6 @@ extern "C" {
 #define W6100                          6100     ///< W6100 Definition
 //Add to
 //
-uint8_t dma_write_data(uint32_t address, uint8_t *buff, uint16_t len);
-uint8_t dma_read_data(uint32_t address, uint8_t *buff, uint16_t len);
 
 #ifndef _WIZCHIP_
 /**

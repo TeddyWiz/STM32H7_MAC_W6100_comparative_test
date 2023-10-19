@@ -28,16 +28,21 @@ ee_u32 CoreMark_cnt = 0;
 //#include "stdio.h"
 #include "w6100.h"
 #include "wizchip_conf.h"
+#include "socket.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-#define SPI_DMA
-#define Send_data_size 	 16000//7300//16000//10000
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#define ETHERNET_BUF_MAX_SIZE (1024 * 16)
+#define SOCKET_TOE_IPERF 0
+#define PORT_TOE_IPERF 5001
+#define USE_SPI_DMA
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,304 +70,276 @@ osThreadId_t CoreMarkHandle;
 const osThreadAttr_t CoreMark_attributes = {
   .name = "CoreMark",
   .stack_size = 1024 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityBelowNormal,
 };
 /* USER CODE BEGIN PV */
-wiz_NetInfo gWIZNETINFO = { .mac = {0x00,0x08,0xdc,0xff,0xff,0xff},
-							.ip = {192,168,10,111},
-							.sn = {255, 255, 255, 0},
-							.gw = {192, 168, 10, 1},
-							.dns = {168, 126, 63, 1},
-							.lla = {0xfe,0x80, 0x00,0x00,
-								 0x00,0x00, 0x00,0x00,
-								 0x02,0x08, 0xdc,0xff,
-								 0xfe,0xff, 0xff,0xff},
-				            .gua={0x20,0x01,0x02,0xb8,
-								 0x00,0x10,0x00,0x01,
-								 0x02,0x08,0xdc,0xff,
-								 0xfe,0xff,0xff,0xff},
-				            .sn6={0xff,0xff,0xff,0xff,
-								 0xff,0xff,0xff,0xff,
-								 0x00,0x00,0x00, 0x00,
-								 0x00,0x00,0x00,0x00},
-				            .gw6={0xfe, 0x80, 0x00,0x00,
-								  0x00,0x00,0x00,0x00,
-								  0x02,0x00, 0x87,0xff,
-								  0xfe,0x08, 0x4c,0x81}
-							};
+static wiz_NetInfo g_net_info =
+    {
+        .mac = {0x00, 0x08, 0xDC, 0x12, 0x34, 0x56}, // MAC address
+        .ip = {192, 168, 10, 111},                     // IP address
+        .sn = {255, 255, 255, 0},                    // Subnet Mask
+        .gw = {192, 168, 10, 1},                     // Gateway
+        .dns = {8, 8, 8, 8},                         // DNS server
+        .lla = {0xfe, 0x80, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x02, 0x08, 0xdc, 0xff,
+                0xfe, 0x57, 0x57, 0x25},             // Link Local Address
+        .gua = {0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00},             // Global Unicast Address
+        .sn6 = {0xff, 0xff, 0xff, 0xff,
+                0xff, 0xff, 0xff, 0xff,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00},             // IPv6 Prefix
+        .gw6 = {0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00},             // Gateway IPv6 Address
+        .dns6 = {0x20, 0x01, 0x48, 0x60,
+                0x48, 0x60, 0x00, 0x00,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00, 0x88, 0x88},             // DNS6 server
+        .ipmode = NETINFO_STATIC_ALL
+};
 
 
-uint8_t WIZ_Dest_IP[4] = {192, 168, 10, 2};                  //DST_IP Address
-uint16_t WIZ_Dest_PORT = 5001;
+static uint8_t g_iperf_buf[ETHERNET_BUF_MAX_SIZE * 2];
 
-uint8_t DestIP6_L[16] = {0xfe,0x80, 0x00,0x00,
-						  0x00,0x00, 0x00,0x00,
-                          0x31,0x71,0x98,0x05,
-                          0x70,0x24,0x4b,0xb1
-						};
-
-uint8_t DestIP6_G[16] = {0x20,0x01,0x02,0xb8,
-                          0x00,0x10,0x00,0x01,
-                          0x31,0x71,0x98,0x05,
-                          0x70,0x24,0x4b,0xb1
-                         };
-
-uint8_t Router_IP[16]= {0xff,0x02,0x00,0x00,
-                          0x00,0x00,0x00,0x00,
-                          0x00,0x00,0x00,0x00,
-                          0x00,0x00,0x00,0x02
-                         };
-uint8_t data_buf[16384];
-uint8_t SPI_DMA_flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MPU_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_USART3_UART_Init(void);
-static void MX_SPI1_Init(void);
 static void MX_DMA_Init(void);
+static void MX_SPI1_Init(void);
+static void MX_USART3_UART_Init(void);
 void StartDefaultTask(void *argument);
 void StartCoreMark(void *argument);
 
 /* USER CODE BEGIN PFP */
-
 uint8_t rxData;
-uint8_t rx_buffer[2048]= {0,};
-int rx_index = 0;
-uint8_t rx_flag =0;
-uint16_t loop_mode = 0;
-uint16_t temp_delay=0, temp_delay_dumi=0;
-#ifdef KEIL
-     #ifdef __GNUC__
-     //With GCC, small printf (option LD Linker->Libraries->Small printf
-     //set to 'Yes') calls __io_putchar()
-         #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-		#else
-				 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-		#endif /* __GNUC__*/
-#endif
-
-#ifdef True_STD
-	int _write(int fd, char *str, int len)
-	{
-		for(int i=0; i<len; i++)
-		{
-			HAL_UART_Transmit(&huart3, (uint8_t *)&str[i], 1, 0xFFFF);
-		}
-		return len;
-	}
-#endif
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-
-    /*
-        This will be called once data is received successfully,
-        via interrupts.
-    */
-
-     /*
-       loop back received data
-     */
-     HAL_UART_Receive_IT(&huart3, &rxData, 1);
-     if (rxData == '\n')
-	 {
-	   if (rx_buffer[rx_index - 1] == '\r')
-	   {
-		 rx_index--;
-		 rx_flag = 1;
-		 rx_buffer[rx_index] = 0;
-	   }
-	   else
-	   {
-		 rx_index = 0;
-		 HAL_UART_Transmit(&huart3, "not support format\r\n", 20, 1000);
-	   }
-	 }
-	 else if (rxData == 0x08) // back space
-	 {
-	   rx_index--;
-	 }
-	 else
-	 {
-	   rx_buffer[rx_index++] = rxData;
-	 }
-     HAL_UART_Transmit(&huart3, &rxData, 1, 1000);
-}
-
-void W6100CsEnable(void);
-void W6100CsDisable(void);
-#define W6100_CS_GPIO  1
-#if 1
-void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-	//printf("SPI DMA Complete\r\n");
-	SPI_DMA_flag = 1;
-}
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-	SPI_DMA_flag = 1;
-}
-#endif
-#if 0
-uint8_t dma_write_data(uint32_t address, uint8_t *buff, uint16_t len)
-{
-
-	uint8_t *temp_pbuf = NULL;
-	uint8_t *pbuf = (uint8_t*)calloc(len + 4, sizeof(uint8_t));
-	temp_pbuf = pbuf;
-	*temp_pbuf++ = (uint8_t)((address & 0x00FF0000) >> 16);
-	*temp_pbuf++ = (uint8_t)((address & 0x0000FF00) >> 8);
-	*temp_pbuf++ = (uint8_t)((address & 0x000000ff)|(_W6100_SPI_WRITE_ ));
-	memcpy(temp_pbuf, buff, len);
-
-	SPI_DMA_flag = 0;
-	HAL_SPI_Transmit_DMA(&hspi1, pbuf, len+3);
-	while(SPI_DMA_flag == 0);
-	//while (HAL_DMA_GetState(hspi1.hdmatx) == HAL_DMA_STATE_BUSY|| HAL_DMA_GetState(hspi1.hdmatx) == HAL_DMA_STATE_RESET);
-	free(pbuf);
-
-	return 0;
-}
-uint8_t dma_read_data(uint32_t address, uint8_t *buff, uint16_t len)
-{
-	//uint8_t temp_pbuf[3] = {0,};
-	//uint8_t *pbuf = (uint8_t*)calloc(len + 4, sizeof(uint8_t));
-	uint8_t *temp_pbuf = (uint8_t*)calloc(len + 4, sizeof(uint8_t));
-	uint8_t *temp_pbuf1 = (uint8_t*)calloc(len + 4, sizeof(uint8_t));
-	*temp_pbuf = (uint8_t)((address & 0x00FF0000) >> 16);
-	*(temp_pbuf + 1) = (uint8_t)((address & 0x0000FF00) >> 8);
-	*(temp_pbuf + 2) = (uint8_t)((address & 0x000000ff)|(_W6100_SPI_READ_ ));
-	//memcpy(temp_pbuf, buff, len);
-	//HAL_SPI_TransmitReceive_DMA_1(&hspi1,temp_pbuf, buff, 3, len);
-	SPI_DMA_flag = 0;
-	while (HAL_SPI_TransmitReceive_DMA(&hspi1,temp_pbuf, temp_pbuf1, len + 3) != HAL_OK);
-	while(SPI_DMA_flag == 0);
-	//while (HAL_DMA_GetState(hspi1.hdmarx) == HAL_DMA_STATE_BUSY|| HAL_DMA_GetState(hspi1.hdmarx) == HAL_DMA_STATE_RESET);
-	memcpy(buff,temp_pbuf1 + 3, len);
-	free(temp_pbuf);
-	free(temp_pbuf1);
-	//free(pbuf);
-	return len;
-}
-#else
-#define spi_delay_en 0
-uint8_t temp_pbuf[8024]={0,}; //16384+3
-uint8_t temp_pbuf1[8024]={0,};
-uint8_t dma_write_data(uint32_t address, uint8_t *buff, uint16_t len)
-{
-	temp_pbuf[0] = (uint8_t)((address & 0x00FF0000) >> 16);
-	temp_pbuf[1] = (uint8_t)((address & 0x0000FF00) >> 8);
-	temp_pbuf[2] = (uint8_t)((address & 0x000000ff)|(_W6100_SPI_WRITE_ ));
-	memcpy(temp_pbuf+3, buff, len);
-#if spi_delay_en
-  for(temp_delay=0;temp_delay<10; temp_delay++)
-  {
-    temp_delay_dumi++;
-  }
-#endif
-#if 0
-	SPI_DMA_flag = 0;
-	HAL_SPI_Transmit_DMA(&hspi1, temp_pbuf, len+3);
-	while(SPI_DMA_flag == 0);
-#else
-  #if W6100_CS_GPIO
-  W6100CsEnable();
-  #endif
-#if 1
-	HAL_SPI_Transmit(&hspi1, temp_pbuf, len+3, 10);
-#else
-	SPI_DMA_flag = 0;
-	HAL_SPI_Transmit_DMA(&hspi1, temp_pbuf, len+3);
-	while(SPI_DMA_flag == 0);
-#endif
-  #if W6100_CS_GPIO
-  W6100CsDisable();
-  #endif
-#endif
-#if spi_delay_en
-  for(temp_delay=0;temp_delay<10; temp_delay++)
-  {
-    temp_delay_dumi++;
-  }
-#endif
-	//while (HAL_DMA_GetState(hspi1.hdmatx) == HAL_DMA_STATE_BUSY|| HAL_DMA_GetState(hspi1.hdmatx) == HAL_DMA_STATE_RESET);
-	return 0;
-}
-uint8_t dma_read_data(uint32_t address, uint8_t *buff, uint16_t len)
-{
-  temp_pbuf[0] = (uint8_t)((address & 0x00FF0000) >> 16);
-	temp_pbuf[1] = (uint8_t)((address & 0x0000FF00) >> 8);
-	temp_pbuf[2] = (uint8_t)((address & 0x000000ff)|(_W6100_SPI_READ_ ));
-#if spi_delay_en
-  for(temp_delay=0;temp_delay<10; temp_delay++)
-  {
-    temp_delay_dumi++;
-  }
-#endif
-	SPI_DMA_flag = 0;
-  #if 0
-	HAL_SPI_TransmitReceive_DMA(&hspi1,temp_pbuf, temp_pbuf1, len + 3);
-	while(SPI_DMA_flag == 0);
-  #else
-  #if W6100_CS_GPIO
-  W6100CsEnable();
-  #endif
-#if 1
-  HAL_SPI_TransmitReceive(&hspi1,temp_pbuf, temp_pbuf1, len + 3, 10);
-#else
-  SPI_DMA_flag = 0;
-  HAL_SPI_TransmitReceive_DMA(&hspi1,temp_pbuf, temp_pbuf1, len + 3);
-  	while(SPI_DMA_flag == 0);
-#endif
-  #if W6100_CS_GPIO
-  W6100CsDisable();
-  #endif
-  #endif
-	//while (HAL_DMA_GetState(hspi1.hdmarx) == HAL_DMA_STATE_BUSY|| HAL_DMA_GetState(hspi1.hdmarx) == HAL_DMA_STATE_RESET);
-	memcpy(buff,temp_pbuf1 + 3, len);
-#if spi_delay_en
-  for(temp_delay=0;temp_delay<10; temp_delay++)
-  {
-    temp_delay_dumi++;
-  }
-#endif
-	return len;
-}
-#endif
-void print_help_menu(void);
-uint16_t CLI_Process(void);
-uint8_t check_break(void)
-{
-  uint16_t cmd_mode;
-  if (rx_flag == 1)
-  {
-    rx_flag = 0;
-    cmd_mode=CLI_Process();
-    if(cmd_mode ==4)
-      return 1;
-  }
-  return 0;
-}
-void end_sig(void)
-{
-  HAL_UART_Transmit(&huart3, (uint8_t *)"1\r\n", 3, 0xFFFF);
-}
-#if 1
-void TRACE_ON(void)
-{
-	HAL_GPIO_WritePin(Trace_GPIO_Port, Trace_Pin, GPIO_PIN_RESET);
-}
-void TRACE_OFF(void)
-{
-	HAL_GPIO_WritePin(Trace_GPIO_Port, Trace_Pin, GPIO_PIN_SET);
-}
-#endif
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+static inline void wizchip_select(void)
+{
+    HAL_GPIO_WritePin(W6100_CS_GPIO_Port, W6100_CS_Pin, GPIO_PIN_RESET);
+}
+
+static inline void wizchip_deselect(void)
+{
+    HAL_GPIO_WritePin(W6100_CS_GPIO_Port, W6100_CS_Pin, GPIO_PIN_SET);
+}
+
+void wizchip_reset()
+{
+
+}
+
+static uint8_t wizchip_read(void)
+{
+    uint8_t rx_data = 0;
+    uint8_t tx_data = 0xFF;
+
+		while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    HAL_SPI_TransmitReceive(&hspi1, &tx_data, &rx_data, 1, 10);
+    while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_RX);
+    
+    return rx_data;
+}
+
+static void wizchip_write(uint8_t tx_data)
+{
+		uint8_t rtnByte;
+
+    while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    HAL_SPI_TransmitReceive(&hspi1, &tx_data, &rtnByte, 1, 10);
+    while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_TX);
+}
+
+#ifndef USE_SPI_DMA
+static void wizchip_read_buf(uint8_t* rx_data, datasize_t len)
+{
+    uint8_t tx_data = 0xFF;
+
+		while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    HAL_SPI_TransmitReceive(&hspi1, &tx_data, rx_data, len, 10);
+    while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_RX);
+}
+
+static void wizchip_write_buf(uint8_t* tx_data, datasize_t len)
+{
+		uint8_t rtnByte;
+    
+    while (HAL_SPI_GetState(&hspi1) != HAL_SPI_STATE_READY);
+    HAL_SPI_TransmitReceive(&hspi1, tx_data, &rtnByte, len, 10);
+    while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_TX);
+}
+
+#else
+
+static void wizchip_read_burst(uint8_t *pBuf, uint16_t len)
+{
+	HAL_SPI_Receive_DMA(&hspi1, pBuf, len);
+  while (HAL_DMA_GetState(hspi1.hdmarx) == HAL_DMA_STATE_BUSY);
+  while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_RX);
+  
+	return;
+}
+
+static void wizchip_write_burst(uint8_t *pBuf, uint16_t len)
+{
+  HAL_SPI_Transmit_DMA(&hspi1, pBuf, len);
+  while (HAL_DMA_GetState(hspi1.hdmatx) == HAL_DMA_STATE_BUSY);
+  while (HAL_SPI_GetState(&hspi1) == HAL_SPI_STATE_BUSY_TX);
+  
+	return;
+}
+#endif
+
+static void wizchip_critical_section_lock(void)
+{
+    __disable_irq();
+}
+
+static void wizchip_critical_section_unlock(void)
+{
+    __enable_irq();
+}
+
+void wizchip_spi_initialize(void)
+{
+
+}
+
+void wizchip_cris_initialize(void)
+{
+	reg_wizchip_cris_cbfunc(wizchip_critical_section_lock, wizchip_critical_section_unlock);
+}
+
+void wizchip_initialize(void)
+{
+    /* Deselect the FLASH : chip select high */
+    wizchip_deselect();
+
+    /* CS function register */
+    reg_wizchip_cs_cbfunc(wizchip_select, wizchip_deselect);
+
+    /* SPI function register */
+#ifdef USE_SPI_DMA
+    reg_wizchip_spi_cbfunc(wizchip_read, wizchip_write, wizchip_read_burst, wizchip_write_burst);
+#else
+    reg_wizchip_spi_cbfunc(wizchip_read, wizchip_write, wizchip_read_buf, wizchip_write_buf);
+#endif
+
+    /* W5x00 initialize */
+    uint8_t temp;
+  
+#if (_WIZCHIP_ == W5100S)
+    uint8_t memsize[2][4] = {{2, 2, 2, 2}, {2, 2, 2, 2}};
+#elif (_WIZCHIP_ == W5500)
+    uint8_t memsize[2][8] = {{16, 0, 0, 0, 0, 0, 0, 0}, {16, 0, 0, 0, 0, 0, 0, 0}};
+#elif (_WIZCHIP_ == W6100)
+    //uint8_t memsize[2][8] = {{2, 2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2, 2}};
+    uint8_t memsize[2][8] = {{16, 0, 0, 0, 0, 0, 0, 0}, {16, 0, 0, 0, 0, 0, 0, 0}};
+#endif
+  
+    if (ctlwizchip(CW_INIT_WIZCHIP, (void *)memsize) == -1)
+    {
+        printf(" W5x00 initialized fail\n");
+
+        return;
+    }
+#if 0
+    /* Check PHY link status */
+    do
+    {
+        if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
+        {
+            printf(" Unknown PHY link status\n");
+
+            return;
+        }
+    } while (temp == PHY_LINK_OFF);
+#endif
+}
+
+void wizchip_check(void)
+{
+#if (_WIZCHIP_ == W5100S)
+    /* Read version register */
+    //if (getVER() != 0x51)
+    {
+        printf(" ACCESS ERR : VERSION != 0x51, read value = 0x%02x\n", getVER());
+
+        //while (1);
+    }
+#elif (_WIZCHIP_ == W5500)
+    /* Read version register */
+    if (getVERSIONR() != 0x04)
+    {
+        printf(" ACCESS ERR : VERSION != 0x04, read value = 0x%02x\n", getVERSIONR());
+
+        while (1)
+            ;
+    }
+#elif (_WIZCHIP_ == W6100)
+    uint16_t ver_val;
+    /* Read version register */
+    ver_val = getCIDR();
+    if (ver_val != 0x6100)
+    {
+        printf(" ACCESS ERR : VERSION != 0x6100, read value = 0x%04x\n", ver_val);
+
+        while (1)
+            ;
+    }
+#endif
+}
+
+/* Network */
+void network_initialize(wiz_NetInfo net_info)
+{
+    uint8_t syslock = SYS_NET_LOCK;
+    ctlwizchip(CW_SYS_UNLOCK, &syslock);
+    ctlnetwork(CN_SET_NETINFO, (void *)&net_info);
+}
+
+void print_network_information(wiz_NetInfo net_info)
+{
+    uint8_t tmp_str[8] = {
+        0,
+    };
+
+    ctlnetwork(CN_GET_NETINFO, (void *)&net_info);
+    ctlwizchip(CW_GET_ID, (void *)tmp_str);
+
+    printf("==========================================================\n");
+    printf(" %s network configuration\n\n", (char *)tmp_str);
+
+    printf(" MAC         : %02X:%02X:%02X:%02X:%02X:%02X\n", net_info.mac[0], net_info.mac[1], net_info.mac[2], net_info.mac[3], net_info.mac[4], net_info.mac[5]);
+    printf(" IP          : %d.%d.%d.%d\n", net_info.ip[0], net_info.ip[1], net_info.ip[2], net_info.ip[3]);
+    printf(" Subnet Mask : %d.%d.%d.%d\n", net_info.sn[0], net_info.sn[1], net_info.sn[2], net_info.sn[3]);
+    printf(" Gateway     : %d.%d.%d.%d\n", net_info.gw[0], net_info.gw[1], net_info.gw[2], net_info.gw[3]);
+    printf(" DNS         : %d.%d.%d.%d\n", net_info.dns[0], net_info.dns[1], net_info.dns[2], net_info.dns[3]);
+    print_ipv6_addr(" GW6 ", net_info.gw6);
+    print_ipv6_addr(" LLA ", net_info.lla);
+    print_ipv6_addr(" GUA ", net_info.gua);
+    print_ipv6_addr(" SUB6", net_info.sn6);
+    print_ipv6_addr(" DNS6", net_info.dns6);
+    printf("==========================================================\n\n");
+}
+
+void print_ipv6_addr(uint8_t* name, uint8_t* ip6addr)
+{
+	printf("%s        : ", name);
+	printf("%04X:%04X", ((uint16_t)ip6addr[0] << 8) | ((uint16_t)ip6addr[1]), ((uint16_t)ip6addr[2] << 8) | ((uint16_t)ip6addr[3]));
+	printf(":%04X:%04X", ((uint16_t)ip6addr[4] << 8) | ((uint16_t)ip6addr[5]), ((uint16_t)ip6addr[6] << 8) | ((uint16_t)ip6addr[7]));
+	printf(":%04X:%04X", ((uint16_t)ip6addr[8] << 8) | ((uint16_t)ip6addr[9]), ((uint16_t)ip6addr[10] << 8) | ((uint16_t)ip6addr[11]));
+	printf(":%04X:%04X\r\n", ((uint16_t)ip6addr[12] << 8) | ((uint16_t)ip6addr[13]), ((uint16_t)ip6addr[14] << 8) | ((uint16_t)ip6addr[15]));
+}
 
 /* USER CODE END 0 */
 
@@ -373,20 +350,12 @@ void TRACE_OFF(void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+
 	uint8_t temp_ver[2]={0,};
 	PLL2_ClocksTypeDef PLL2_Clk_data;
 	uint16_t temp_presc = 1, temp_presc_set, temp_presc_cnt = 0;
 	int i = 0;
   /* USER CODE END 1 */
-
-  /* MPU Configuration--------------------------------------------------------*/
-  MPU_Config();
-
-  /* Enable I-Cache---------------------------------------------------------*/
-  SCB_EnableICache();
-
-  /* Enable D-Cache---------------------------------------------------------*/
-  SCB_EnableDCache();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -406,14 +375,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART3_UART_Init();
-  MX_SPI1_Init();
   MX_DMA_Init();
+  MX_SPI1_Init();
+  MX_USART3_UART_Init();
   //MX_CoreMarkApp_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, &rxData, 1);
     printf("< W6100 clock TEST!! >\r\n");
-    W6100CsDisable();
+    //W6100CsDisable();
     HAL_RCCEx_GetPLL2ClockFreq(&PLL2_Clk_data);
       printf("SET PLL2 P:%ld, Q:%ld, R:%ld \r\n", PLL2_Clk_data.PLL2_P_Frequency, PLL2_Clk_data.PLL2_Q_Frequency, PLL2_Clk_data.PLL2_R_Frequency);
       temp_presc_set = (hspi1.Init.BaudRatePrescaler>>(4*7));
@@ -423,32 +392,16 @@ int main(void)
       	temp_presc = temp_presc*2;
       }
       printf("SPI CLK %d Mhz \r\n", (int)(PLL2_Clk_data.PLL2_P_Frequency / (2*temp_presc) / 1000000));
-#if 0
-    W6100CsEnable();
-  	dma_read_data(0x000200, temp_ver, 2);
-    W6100CsDisable();
-  	printf("VER 0x%02X %02X\r\n", temp_ver[0], temp_ver[1]);
-#endif
-  	//int i = 0;
-  		uint8_t syslock = SYS_NET_LOCK;
-  		int8_t *data= NULL;
-  		int32_t ret;
-  		//uint8_t temp_ver[2]={0,};
-  		printf("start W6100 \r\n");
-  		W6100CsEnable();
-  		dma_read_data(0x000200, temp_ver, 2);
-  		W6100CsDisable();
-  		printf("VER 0x%02X %02X\r\n", temp_ver[0], temp_ver[1]);
-  		W6100Initialze();
-  		ctlwizchip(CW_SYS_UNLOCK,& syslock);
-  		ctlnetwork(CN_SET_NETINFO,&gWIZNETINFO);
-  		for (i = 0; i < 8; i++)
-  		  {
-  			printf("%d : max size = %d k \r\n", i, getSn_TxMAX(i));
-  		  }
-  		printf("VERSION(%x) = %.2x \r\n", _VER_,getVER());
-  		print_network_information();
-  		printf("\r\n>");
+  printf("iperf Test TOE\r\n");
+  //HAL_UART_Transmit(&huart3, "iperf Test TOE1\r\n", 17, 10);
+  printf("GetSysClockFreq = %dhz\r\n", HAL_RCC_GetSysClockFreq());
+	wizchip_reset();
+	wizchip_initialize();
+	wizchip_check();
+  
+  network_initialize(g_net_info);
+  print_network_information(g_net_info);
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -519,10 +472,6 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
-
-  /** Macro to configure the PLL clock source
-  */
-  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_CSI);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -687,6 +636,8 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -786,127 +737,23 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_YELLOW_GPIO_Port, &GPIO_InitStruct);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
 
-uint8_t W6100SpiReadByte(void)
+PUTCHAR_PROTOTYPE
 {
+    /* Implement your write code here, this is used by puts and printf for example */
 
-	uint8_t rx = 0, tx = 0xFF;
-	HAL_SPI_TransmitReceive(&hspi1, &tx, &rx, 1, 10);
-	//HAL_SPI_Receive(&hspi1, &rx, 1, 10);
-	return rx;
+    /* Place your implementation of fputc here */
+    /* e.g. write a character to the USART */
 
-}
-
-void W6100SpiWriteByte(uint8_t byte)
-{
-#ifdef USE_STDPERIPH_DRIVER
-
-	while (SPI_I2S_GetFlagStatus(W6100_SPI, SPI_I2S_FLAG_TXE) == RESET);
-	SPI_I2S_SendData(W6100_SPI, byte);
-	while (SPI_I2S_GetFlagStatus(W6100_SPI, SPI_I2S_FLAG_RXNE) == RESET);
-	SPI_I2S_ReceiveData(W6100_SPI);
-
-#elif defined USE_HAL_DRIVER
-
-	uint8_t rx;
-	HAL_SPI_TransmitReceive(&hspi1, &byte, &rx, 1, 10);
-#endif
-    return 0;
-}
-void W6100SpiReadBurst(uint8_t* buf, datasize_t len)
-{
-	uint8_t tx[Send_data_size];
-	HAL_SPI_TransmitReceive(&hspi1, tx, buf, len, 10);
-	//HAL_SPI_Receive(&hspi1, buf, len, 10);
-}
-void W6100SpiWriteBurst(uint8_t* buf, datasize_t len)
-{
-	uint8_t rx[Send_data_size];
-	HAL_SPI_TransmitReceive(&hspi1, buf, rx, len, 10);
-}
-void W6100CsEnable(void)
-{
-	HAL_GPIO_WritePin(W6100_CS_GPIO_Port, W6100_CS_Pin, GPIO_PIN_RESET);
-}
-
-void W6100CsDisable(void)
-{
-	HAL_GPIO_WritePin(W6100_CS_GPIO_Port, W6100_CS_Pin, GPIO_PIN_SET);
-}
-
-void W6100Initialze(void)
-{
-	//W6100Reset();
-
-#if _WIZCHIP_IO_MODE_ & _WIZCHIP_IO_MODE_SPI_
-/* SPI method callback registration */
-	#if defined SPI_DMA
-	reg_wizchip_spi_cbfunc(W6100SpiReadByte, W6100SpiWriteByte, W6100SpiReadBurst, W6100SpiWriteBurst);
-	#else
-	reg_wizchip_spi_cbfunc(W6100SpiReadByte, W6100SpiWriteByte, 0, 0);
-	#endif
-	/* CS function register */
-	reg_wizchip_cs_cbfunc(W6100CsEnable, W6100CsDisable);
-#else
-/* Indirect bus method callback registration */
-	#if defined BUS_DMA
-	reg_wizchip_bus_cbfunc(W6100BusReadByte, W6100BusWriteByte, W6100BusReadBurst, W6100BusWriteBurst);
-	#else
-	reg_wizchip_bus_cbfunc(W6100BusReadByte, W6100BusWriteByte, 0, 0);
-	#endif
-#endif
-	uint8_t temp;
-	//unsigned char W6100_AdrSet[2][8] = {{2, 2, 2, 2, 2, 2, 2, 2}, {2, 2, 2, 2, 2, 2, 2, 2}};
-	unsigned char W6100_AdrSet[2][8] = {{16, 0, 0, 0, 0, 0, 0, 0}, {16, 0, 0, 0, 0, 0, 0, 0}};
-	do
-	{
-		if (ctlwizchip(CW_GET_PHYLINK, (void *)&temp) == -1)
-		{
-			printf("Unknown PHY link status.\r\n");
-		}
-	} while (temp == PHY_LINK_OFF);
-	printf("PHY OK.\r\n");
-
-	temp = IK_DEST_UNREACH;
-
-	if (ctlwizchip(CW_INIT_WIZCHIP, (void *)W6100_AdrSet) == -1)
-	{
-		printf("W6100 initialized fail.\r\n");
-	}
-
-	if (ctlwizchip(CW_SET_INTRMASK, &temp) == -1)
-	{
-		printf("W6100 interrupt\r\n");
-	}
-	//printf("interrupt mask: %02x\r\n",getIMR());
-}
-void print_network_information(void)
-{
-	wizchip_getnetinfo(&gWIZNETINFO);
-	printf("Mac address: %02x:%02x:%02x:%02x:%02x:%02x\n\r",gWIZNETINFO.mac[0],gWIZNETINFO.mac[1],gWIZNETINFO.mac[2],gWIZNETINFO.mac[3],gWIZNETINFO.mac[4],gWIZNETINFO.mac[5]);
-	printf("IP address : %d.%d.%d.%d\n\r",gWIZNETINFO.ip[0],gWIZNETINFO.ip[1],gWIZNETINFO.ip[2],gWIZNETINFO.ip[3]);
-	printf("SN Mask	   : %d.%d.%d.%d\n\r",gWIZNETINFO.sn[0],gWIZNETINFO.sn[1],gWIZNETINFO.sn[2],gWIZNETINFO.sn[3]);
-	printf("Gate way   : %d.%d.%d.%d\n\r",gWIZNETINFO.gw[0],gWIZNETINFO.gw[1],gWIZNETINFO.gw[2],gWIZNETINFO.gw[3]);
-	printf("DNS Server : %d.%d.%d.%d\n\r",gWIZNETINFO.dns[0],gWIZNETINFO.dns[1],gWIZNETINFO.dns[2],gWIZNETINFO.dns[3]);
-	printf("LLA  : %.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X\r\n",gWIZNETINFO.lla[0],gWIZNETINFO.lla[1],gWIZNETINFO.lla[2],gWIZNETINFO.lla[3],\
-									gWIZNETINFO.lla[4],gWIZNETINFO.lla[5],gWIZNETINFO.lla[6],gWIZNETINFO.lla[7],\
-									gWIZNETINFO.lla[8],gWIZNETINFO.lla[9],gWIZNETINFO.lla[10],gWIZNETINFO.lla[11],\
-									gWIZNETINFO.lla[12],gWIZNETINFO.lla[13],gWIZNETINFO.lla[14],gWIZNETINFO.lla[15]);
-	printf("GUA  : %.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X\n\r",gWIZNETINFO.gua[0],gWIZNETINFO.gua[1],gWIZNETINFO.gua[2],gWIZNETINFO.gua[3],\
-									gWIZNETINFO.gua[4],gWIZNETINFO.gua[5],gWIZNETINFO.gua[6],gWIZNETINFO.gua[7],\
-									gWIZNETINFO.gua[8],gWIZNETINFO.gua[9],gWIZNETINFO.gua[10],gWIZNETINFO.gua[11],\
-									gWIZNETINFO.gua[12],gWIZNETINFO.gua[13],gWIZNETINFO.gua[14],gWIZNETINFO.gua[15]);
-	printf("SN6  : %.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X\n\r",gWIZNETINFO.sn6[0],gWIZNETINFO.sn6[1],gWIZNETINFO.sn6[2],gWIZNETINFO.sn6[3],\
-									gWIZNETINFO.sn6[4],gWIZNETINFO.sn6[5],gWIZNETINFO.sn6[6],gWIZNETINFO.sn6[7],\
-									gWIZNETINFO.sn6[8],gWIZNETINFO.sn6[9],gWIZNETINFO.sn6[10],gWIZNETINFO.sn6[11],\
-									gWIZNETINFO.sn6[12],gWIZNETINFO.sn6[13],gWIZNETINFO.sn6[14],gWIZNETINFO.sn6[15]);
-	printf("GW6  : %.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X:%.2X%.2X\r\n",gWIZNETINFO.gw6[0],gWIZNETINFO.gw6[1],gWIZNETINFO.gw6[2],gWIZNETINFO.gw6[3],\
-									gWIZNETINFO.gw6[4],gWIZNETINFO.gw6[5],gWIZNETINFO.gw6[6],gWIZNETINFO.gw6[7],\
-									gWIZNETINFO.gw6[8],gWIZNETINFO.gw6[9],gWIZNETINFO.gw6[10],gWIZNETINFO.gw6[11],\
-									gWIZNETINFO.gw6[12],gWIZNETINFO.gw6[13],gWIZNETINFO.gw6[14],gWIZNETINFO.gw6[15]);
+    uint8_t c[1];
+    c[0] = ch & 0x00FF;
+    HAL_UART_Transmit(&huart3, &c[0], 1, 10);
+    return ch;
 }
 
 /* USER CODE END 4 */
@@ -921,11 +768,32 @@ void print_network_information(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-
+	uint32_t pack_len = 0;
   /* Infinite loop */
   for(;;)
   {
-	  tcps_status(0, 5001, AS_IPV4);
+    switch(getSn_SR(SOCKET_TOE_IPERF))
+    {
+      case SOCK_ESTABLISHED :
+        while(1)
+        {
+          getsockopt(SOCKET_TOE_IPERF, SO_RECVBUF, &pack_len);
+          if (pack_len > 0)
+            recv_iperf(SOCKET_TOE_IPERF, (uint8_t *)g_iperf_buf, ETHERNET_BUF_MAX_SIZE / 2);
+          
+        }
+      case SOCK_CLOSE_WAIT :
+        disconnect(SOCKET_TOE_IPERF);
+        break;
+      case SOCK_INIT :
+        listen(SOCKET_TOE_IPERF);
+        break;
+      case SOCK_CLOSED:
+        socket(SOCKET_TOE_IPERF, Sn_MR_TCP4, PORT_TOE_IPERF, SOCK_IO_NONBLOCK);
+        break;
+      default:
+        break;
+    }
     //osDelay(1);
   }
   /* USER CODE END 5 */
@@ -949,35 +817,6 @@ void StartCoreMark(void *argument)
     osDelay(1000);
   }
   /* USER CODE END StartCoreMark */
-}
-
-/* MPU Configuration */
-
-void MPU_Config(void)
-{
-  MPU_Region_InitTypeDef MPU_InitStruct = {0};
-
-  /* Disables the MPU */
-  HAL_MPU_Disable();
-
-  /** Initializes and configures the Region and the memory to be protected
-  */
-  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
-  MPU_InitStruct.Number = MPU_REGION_NUMBER0;
-  MPU_InitStruct.BaseAddress = 0x0;
-  MPU_InitStruct.Size = MPU_REGION_SIZE_4GB;
-  MPU_InitStruct.SubRegionDisable = 0x87;
-  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
-  MPU_InitStruct.AccessPermission = MPU_REGION_NO_ACCESS;
-  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
-  MPU_InitStruct.IsShareable = MPU_ACCESS_SHAREABLE;
-  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
-  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
-
-  HAL_MPU_ConfigRegion(&MPU_InitStruct);
-  /* Enables the MPU */
-  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
-
 }
 
 /**

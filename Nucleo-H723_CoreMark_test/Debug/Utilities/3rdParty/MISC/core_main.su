@@ -1,2 +1,2 @@
-../Utilities/3rdParty/MISC/core_main.c:38:7:iterate	32	static
-../Utilities/3rdParty/MISC/core_main.c:89:18:coremark_main	2152	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_main.c:38:7:iterate	32	static
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_main.c:89:18:coremark_main	2152	static

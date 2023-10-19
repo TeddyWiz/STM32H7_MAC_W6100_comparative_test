@@ -334,78 +334,6 @@ datasize_t send(uint8_t sn, uint8_t * buf, datasize_t len)
    return len;
 }
 
-datasize_t send_t(uint8_t sn, uint8_t * buf, datasize_t len)
-{
-    uint8_t temp_ret[2] = {0,};
-    datasize_t freesize=0;
-    freesize = (datasize_t)getSn_TX_FSR(sn);
-    if(freesize==0)
-        return 0;
-    if (len > freesize) len = freesize;
-    wiz_send_data(sn, buf, len);
-
-    setSn_CR(sn,Sn_CR_SEND);
-    temp_ret[0] = getSn_CR(sn);
-    temp_ret[1] = getSn_CR(sn);
-    if(temp_ret[0] != temp_ret[1])
-    {
-        printf("Sn_Cr error %02X, %02X \r\n", temp_ret[0], temp_ret[1]);
-    }
-    //printf("check sendok p %d\r\n",__LINE__);
-    while ( !(getSn_IR(sn) & Sn_IR_SENDOK) )
-    {  
-    #if 0
-     tmp = getSn_SR(sn);
-     if ((tmp != SOCK_ESTABLISHED) && (tmp != SOCK_CLOSE_WAIT) )
-     {
-        if( (tmp == SOCK_CLOSED) || (getSn_IR(sn) & Sn_IR_TIMEOUT) ) close(sn);
-        return SOCKERR_SOCKSTATUS;
-     }
-     if(sock_io_mode & (1<<sn)) return SOCK_BUSY;
-     #endif
-    }
-    setSn_IRCLR(sn, Sn_IR_SENDOK);
-    //printf("check sendok a %d\r\n",__LINE__);
-    return len;
-}
-
-datasize_t send_t2(uint8_t sn, uint8_t * buf, datasize_t len)
-{
-   uint8_t tmp=0;
-   datasize_t freesize=0;
-   /* 
-    * The below codes can be omitted for optmization of speed
-    */
-   //CHECK_SOCKNUM();
-   //CHECK_TCPMODE(Sn_MR_TCP4);
-   /************/
-
-    freesize = (datasize_t)getSn_TX_FSR(sn);
-    if(freesize==0)
-        return 0;
-    if (len > freesize) len = freesize;
-   wiz_send_data(sn, buf, len);
-   if(sock_is_sending & (1<<sn))
-   {
-      while ( !(getSn_IR(sn) & Sn_IR_SENDOK) )
-      {    
-         tmp = getSn_SR(sn);
-         if ((tmp != SOCK_ESTABLISHED) && (tmp != SOCK_CLOSE_WAIT) )
-         {
-            if( (tmp == SOCK_CLOSED) || (getSn_IR(sn) & Sn_IR_TIMEOUT) ) close(sn);
-            return SOCKERR_SOCKSTATUS;
-         }
-         if(sock_io_mode & (1<<sn)) return SOCK_BUSY;
-      } 
-      setSn_IRCLR(sn, Sn_IR_SENDOK);
-   }
-   setSn_CR(sn,Sn_CR_SEND);
- 
-   while(getSn_CR(sn));   // wait to process the command...
-   sock_is_sending |= (1<<sn);
- 
-   return len;
-}
 
 datasize_t recv(uint8_t sn, uint8_t * buf, datasize_t len)
 {
@@ -440,6 +368,14 @@ datasize_t recv(uint8_t sn, uint8_t * buf, datasize_t len)
    return len;
 }
 
+datasize_t recv_iperf(uint8_t sn, uint8_t * buf, uint16_t len)
+{
+   wiz_recv_data(sn, buf, len);
+   setSn_CR(sn,Sn_CR_RECV);
+   while(getSn_CR(sn));
+
+   return (int32_t)len;
+}
 
 datasize_t sendto(uint8_t sn, uint8_t * buf, datasize_t len, uint8_t * addr, uint16_t port, uint8_t addrlen)
 {

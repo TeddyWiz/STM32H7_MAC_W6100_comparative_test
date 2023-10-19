@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (10.3-2021.10)
+# Toolchain: GNU Tools for STM32 (11.3.rel1)
 ################################################################################
 
 -include ../makefile.init
@@ -72,8 +72,8 @@ all: main-build
 main-build: Nucleo-H723_CoreMark_test.elf secondary-outputs
 
 # Tool invocations
-Nucleo-H723_CoreMark_test.elf Nucleo-H723_CoreMark_test.map: $(OBJS) $(USER_OBJS) D:\wiznet\05_WorkSpace\04_w6100\03_STMh723_W6100_Test\Nucleo-H723_CoreMark_test\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "Nucleo-H723_CoreMark_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"D:\wiznet\05_WorkSpace\04_w6100\03_STMh723_W6100_Test\Nucleo-H723_CoreMark_test\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo-H723_CoreMark_test.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Nucleo-H723_CoreMark_test.elf Nucleo-H723_CoreMark_test.map: $(OBJS) $(USER_OBJS) D:\wiznet\Workspace_Code\10_W6100\STM32H7_MAC_W6100_comparative_test\Nucleo-H723_CoreMark_test\STM32H723ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Nucleo-H723_CoreMark_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"D:\wiznet\Workspace_Code\10_W6100\STM32H7_MAC_W6100_comparative_test\Nucleo-H723_CoreMark_test\STM32H723ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Nucleo-H723_CoreMark_test.map" -Wl,--gc-sections -static -u _printf_float --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

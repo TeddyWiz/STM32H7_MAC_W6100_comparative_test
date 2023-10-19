@@ -46,14 +46,13 @@
 
 #if _WIZCHIP_ == 6100
 ////////////////////////////////////////////////////////////////////////////////////////
-#define SPI_IN_FUNC      0
+
 
 #define _W6100_SPI_OP_          _WIZCHIP_SPI_VDM_OP_
 
 //////////////////////////////////////////////////
 void WIZCHIP_WRITE(uint32_t AddrSel, uint8_t wb )
 {
-#if SPI_IN_FUNC
    uint8_t tAD[4];
    tAD[0] = (uint8_t)((AddrSel & 0x00FF0000) >> 16);
    tAD[1] = (uint8_t)((AddrSel & 0x0000FF00) >> 8);
@@ -75,15 +74,11 @@ void WIZCHIP_WRITE(uint32_t AddrSel, uint8_t wb )
 
    WIZCHIP.CS._d_e_s_e_l_e_c_t_();
    WIZCHIP_CRITICAL_EXIT();
-#else
-   dma_write_data(AddrSel, &wb, 1);
-#endif
 }
 
 uint8_t  WIZCHIP_READ(uint32_t AddrSel)
 {
    uint8_t ret;
-#if SPI_IN_FUNC
    uint8_t tAD[3];
    tAD[0] = (uint8_t)((AddrSel & 0x00FF0000) >> 16);
    tAD[1] = (uint8_t)((AddrSel & 0x0000FF00) >> 8);
@@ -105,15 +100,11 @@ uint8_t  WIZCHIP_READ(uint32_t AddrSel)
 
    WIZCHIP.CS._d_e_s_e_l_e_c_t_();
    WIZCHIP_CRITICAL_EXIT();
-#else
-   dma_read_data(AddrSel, &ret, 1);
-#endif
    return ret;
 }
 
 void WIZCHIP_WRITE_BUF(uint32_t AddrSel, uint8_t* pBuf, datasize_t len)
 {
-#if SPI_IN_FUNC
    uint8_t tAD[3];
    tAD[0] = (uint8_t)((AddrSel & 0x00FF0000) >> 16);
    tAD[1] = (uint8_t)((AddrSel & 0x0000FF00) >> 8);
@@ -138,14 +129,10 @@ void WIZCHIP_WRITE_BUF(uint32_t AddrSel, uint8_t* pBuf, datasize_t len)
 
    WIZCHIP.CS._d_e_s_e_l_e_c_t_();
    WIZCHIP_CRITICAL_EXIT();
-#else
-   dma_write_data(AddrSel, pBuf, len);
-#endif
 }
 
 void WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, datasize_t len)
 {
-#if SPI_IN_FUNC
    uint8_t tAD[3];
    tAD[0] = (uint8_t)((AddrSel & 0x00FF0000) >> 16);
    tAD[1] = (uint8_t)((AddrSel & 0x0000FF00) >> 8);
@@ -166,9 +153,6 @@ void WIZCHIP_READ_BUF (uint32_t AddrSel, uint8_t* pBuf, datasize_t len)
 #endif
    WIZCHIP.CS._d_e_s_e_l_e_c_t_();
    WIZCHIP_CRITICAL_EXIT();
-#else
-   dma_read_data(AddrSel, pBuf, len);
-#endif
 }
 
 datasize_t getSn_TX_FSR(uint8_t sn)

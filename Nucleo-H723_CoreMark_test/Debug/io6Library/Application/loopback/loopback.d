@@ -1,14 +1,14 @@
 io6Library/Application/loopback/loopback.o: \
- D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.c \
- D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.h \
- D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.h \
- D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h \
- d:\wiznet\05_workspace\04_w6100\03_stmh723_w6100_test\nucleo-h723_coremark_test\io6library\ethernet\w6100\w6100.h \
- D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h \
- d:\wiznet\05_workspace\04_w6100\03_stmh723_w6100_test\nucleo-h723_coremark_test\io6library\application\application.h
-D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.h:
-D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.h:
-D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h:
-d:\wiznet\05_workspace\04_w6100\03_stmh723_w6100_test\nucleo-h723_coremark_test\io6library\ethernet\w6100\w6100.h:
-D:/wiznet/05_WorkSpace/04_w6100/03_STMh723_W6100_Test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h:
-d:\wiznet\05_workspace\04_w6100\03_stmh723_w6100_test\nucleo-h723_coremark_test\io6library\application\application.h:
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.c \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/./W6100/w6100.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/../Application/Application.h
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Application/loopback/loopback.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/socket.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/./W6100/w6100.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/wizchip_conf.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/io6Library/Ethernet/../Application/Application.h:

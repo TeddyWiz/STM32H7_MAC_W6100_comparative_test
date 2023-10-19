@@ -1,6 +1,7 @@
 Utilities/3rdParty/MISC/core_state.o: \
- ../Utilities/3rdParty/MISC/core_state.c \
- ../Utilities/3rdParty/MISC/coremark.h ../CoreMarkApp/App/core_portme.h \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/core_state.c \
+ D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/coremark.h \
+ ../CoreMarkApp/App/core_portme.h \
  ../CoreMarkApp/3rdParty.I-CUBE-CoreMark_conf.h ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
@@ -36,7 +37,7 @@ Utilities/3rdParty/MISC/core_state.o: \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_uart_ex.h
-../Utilities/3rdParty/MISC/coremark.h:
+D:/wiznet/Workspace_Code/10_W6100/STM32H7_MAC_W6100_comparative_test/Nucleo-H723_CoreMark_test/Utilities/3rdParty/MISC/coremark.h:
 ../CoreMarkApp/App/core_portme.h:
 ../CoreMarkApp/3rdParty.I-CUBE-CoreMark_conf.h:
 ../Core/Inc/main.h:
